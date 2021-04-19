@@ -71,6 +71,24 @@ namespace Matrix
             return inverse / abc;
         }
 
+        public static Matrix3x3 operator +(Matrix3x3 m1, Matrix3x3 m2)
+        {
+            return new Matrix3x3
+            {
+                [0, 0] = m1[0, 0] + m2[0, 0],
+                [0, 1] = m1[0, 1] + m2[0, 1],
+                [0, 2] = m1[0, 2] + m2[0, 2],
+                
+                [1, 0] = m1[1, 0] + m2[1, 0],
+                [1, 1] = m1[1, 1] + m2[1, 1],
+                [1, 2] = m1[1, 2] + m2[1, 2],
+                
+                [2, 0] = m1[2, 0] + m2[2, 0],
+                [2, 1] = m1[2, 1] + m2[2, 1],
+                [2, 2] = m1[2, 2] + m2[2, 2]
+            };
+        }
+
         public static Matrix3x3 operator /(Matrix3x3 m, float v)
         {
             var multiplicator = 1f / v;

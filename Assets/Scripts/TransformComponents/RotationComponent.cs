@@ -16,9 +16,9 @@ namespace TransformComponents
 
         public Vector3D Apply(Vector3D sourceVector)
         {
-            var result = CalculateXMatrix() * sourceVector;
+            var result = CalculateZMatrix() * sourceVector;
+            result = CalculateXMatrix() * result;
             result = CalculateYMatrix() * result;
-            result = CalculateZMatrix() * result;
             return result;
         }
 

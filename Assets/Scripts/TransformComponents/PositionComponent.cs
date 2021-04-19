@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using Vector;
 
 namespace TransformComponents
 {
@@ -10,7 +11,8 @@ namespace TransformComponents
         [SerializeField] private float y;
         [SerializeField] private float z;
         
-        public Vector3 Apply(Vector3 sourcePosition)
+        // TODO: производить операции матрицами
+        public Vector3D Apply(Vector3D sourcePosition)
         {
             sourcePosition.x += x;
             sourcePosition.y += y;

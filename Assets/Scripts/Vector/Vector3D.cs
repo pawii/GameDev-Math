@@ -40,6 +40,11 @@ namespace Vector
             return normalizedTarget * Dot(this, normalizedTarget);
         }
 
+        public Vector3 ToNativeVector()
+        {
+            return new Vector3(x, y, z);
+        }
+
         #region Operators
 
         public static Vector3D operator -(Vector3D v1, Vector3D v2) =>

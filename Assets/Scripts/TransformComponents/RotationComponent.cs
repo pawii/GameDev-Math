@@ -6,25 +6,73 @@ using Vector;
 namespace TransformComponents
 {
     [Serializable]
-    public class RotationComponent
+    public class RotationComponent : MonoBehaviour
     {
-        [SerializeField] private float x;
-        [SerializeField] private float y;
-        [SerializeField] private float z;
+        [Serializable]
+        public enum RotationType { Euler, Quaternion }
 
-        private Matrix3x3 transformMatrix = new Matrix3x3();
+        [SerializeField] private RotationType rotationType;
+        
+        [SerializeField] private float eulerX;
+        [SerializeField] private float eulerY;
+        [SerializeField] private float eulerZ;
+        
+        [SerializeField] private float quaternionX;
+        [SerializeField] private float quaternionY;
+        [SerializeField] private float quaternionZ;
+        [SerializeField] private float quaternionW;
 
         public Vector3D Apply(Vector3D sourceVector)
         {
-            var result = CalculateZMatrix() * sourceVector;
-            result = CalculateXMatrix() * result;
-            result = CalculateYMatrix() * result;
+            switch (rotationType)
+            {
+                case RotationType.Euler:
+                    return CalculateEulerMatrix() * sourceVector;
+                case RotationType.Quaternion:
+                    return RotateQuaternion(sourceVector);
+                default:
+                    return sourceVector;
+            }
+        }
+
+        #region Quaternion
+
+        public Vector3D RotateQuaternion(Vector3D sourceVector)
+        {
+            if (Mathf.Approximately(quaternionX, 0f) &&
+                Mathf.Approximately(quaternionY, 0f) && 
+                Mathf.Approximately(quaternionZ, 0f))
+            {
+                return sourceVector;
+            }
+            
+            var rotAngel = quaternionW * Mathf.Deg2Rad;
+
+            // sourceVector = i + j;
+            var i = new Vector3D(quaternionX, quaternionY, quaternionZ).normalized;
+            var j = sourceVector - (Vector3D.Dot(sourceVector, i) * i);
+            var k = Vector3.Cross(i.ToNativeVector(), sourceVector.ToNativeVector()).ToCustomVector();
+
+            // result = ir + jr;
+            var ir = Vector3D.Dot(sourceVector, i) * i;
+            var jr = j * Mathf.Cos(rotAngel) + k * Mathf.Sin(rotAngel);
+
+            var result = ir + jr;
             return result;
         }
 
-        private Matrix3x3 CalculateXMatrix()
+        #endregion
+
+        #region Euler
+
+        private Matrix3x3 CalculateEulerMatrix()
         {
-            var radianAngel = x * Mathf.Deg2Rad;
+            return CalculateEulerYMatrix() * CalculateEulerXMatrix() * CalculateEulerZMatrix();
+        }
+
+        private Matrix3x3 CalculateEulerXMatrix()
+        {
+            var radianAngel = eulerX * Mathf.Deg2Rad;
             var cos = Mathf.Cos(radianAngel);
             var sin = Mathf.Sin(radianAngel);
             return new Matrix3x3()
@@ -43,9 +91,9 @@ namespace TransformComponents
             };
         }
 
-        private Matrix3x3 CalculateYMatrix()
+        private Matrix3x3 CalculateEulerYMatrix()
         {
-            var radianAngel = y * Mathf.Deg2Rad;
+            var radianAngel = eulerY * Mathf.Deg2Rad;
             var cos = Mathf.Cos(radianAngel);
             var sin = Mathf.Sin(radianAngel);
             return new Matrix3x3()
@@ -64,9 +112,9 @@ namespace TransformComponents
             };
         }
 
-        private Matrix3x3 CalculateZMatrix()
+        private Matrix3x3 CalculateEulerZMatrix()
         {
-            var radianAngel = z * Mathf.Deg2Rad;
+            var radianAngel = eulerZ * Mathf.Deg2Rad;
             var cos = Mathf.Cos(radianAngel);
             var sin = Mathf.Sin(radianAngel);
             return new Matrix3x3()
@@ -83,6 +131,18 @@ namespace TransformComponents
                 [2, 1] = 0,
                 [2, 2] = 1,
             };
+        }
+
+        #endregion
+
+        private void OnDrawGizmos()
+        {
+            if (rotationType == RotationType.Quaternion)
+            {
+                Gizmos.color = Color.red;
+                var vector = new Vector3(quaternionX, quaternionY, quaternionZ).normalized;
+                Gizmos.DrawLine(transform.position + vector * -10f, transform.position + vector * 10f);
+            }
         }
     }
 }

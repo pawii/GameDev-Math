@@ -46,6 +46,9 @@ namespace Vector
         }
 
         #region Operators
+        
+        public static Vector3D operator +(Vector3D v1, Vector3D v2) =>
+            new Vector3D(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z);
 
         public static Vector3D operator -(Vector3D v1, Vector3D v2) =>
             new Vector3D(v1.x - v2.x, v1.y - v2.y, v1.z - v2.z);
@@ -54,7 +57,18 @@ namespace Vector
 
         public static Vector3D operator *(Vector3D source, float value) => 
             new Vector3D(source.x * value, source.y * value, source.z * value);
+        
+        public static Vector3D operator *(float value, Vector3D source) => 
+            new Vector3D(source.x * value, source.y * value, source.z * value);
 
         #endregion
+    }
+
+    public static class Vector3Extensions
+    {
+        public static Vector3D ToCustomVector(this Vector3 vector)
+        {
+            return new Vector3D(vector.x, vector.y, vector.z);
+        }
     }
 }
